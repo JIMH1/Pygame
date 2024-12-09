@@ -23,7 +23,7 @@ FPS = 60
 # Pelaaja
 player_size = 50
 player_x = SCREEN_WIDTH // 2
-player_y = SCREEN_HEIGHT - player_size - 10
+player_y = 10  # Pelaaja lähellä yläreunaa
 player_speed = 5
 
 # Esteet
@@ -55,7 +55,7 @@ highscore = load_score()
 # Funktio esteiden luomiseen
 def create_obstacle():
     x = random.randint(0, SCREEN_WIDTH - obstacle_width)
-    y = -obstacle_height
+    y = SCREEN_HEIGHT  # Aloita alhaalta
     return [x, y]
 
 # Pelilooppi
@@ -79,9 +79,10 @@ while running:
         obstacles.append(create_obstacle())
 
     for obstacle in obstacles:
-        obstacle[1] += obstacle_speed
+     obstacle[1] -= obstacle_speed  # Liiku ylöspäin
 
-    obstacles = [obs for obs in obstacles if obs[1] < SCREEN_HEIGHT]
+    obstacles = [obs for obs in obstacles if obs[1] + obstacle_height > 0]
+
 
     # Törmäyksen tarkistus
     for obstacle in obstacles:
