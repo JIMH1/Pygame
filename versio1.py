@@ -25,6 +25,7 @@ player_size = 50
 player_x = SCREEN_WIDTH // 2
 player_y = 10  # Pelaaja lähellä yläreunaa
 player_speed = 5
+max_vertical_speed = 10
 
 # Esteet
 obstacle_width = 50
@@ -66,13 +67,18 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                obstacle_speed = min(max_vertical_speed, obstacle_speed + 1)
+            if event.key == pygame.K_DOWN:
+                obstacle_speed = max(1, obstacle_speed - 1)
 
     # Pelaajan liike
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] and player_x > 0:
         player_x -= player_speed
     if keys[pygame.K_RIGHT] and player_x < SCREEN_WIDTH - player_size:
-        player_x += player_speed
+        player_x += player_speed        
 
     # Esteiden hallinta
     if random.randint(1, 20) == 1:
@@ -105,8 +111,10 @@ while running:
     # Piirrä pisteet
     score_text = font.render(f"Pisteet: {score}", True, BLACK)
     highscore_text = font.render(f"Ennätys: {highscore}", True, BLACK)
+    speed_text = font.render(f"Speed: {obstacle_speed}", True, BLACK)
     screen.blit(score_text, (10, 10))
     screen.blit(highscore_text, (10, 40))
+    screen.blit(speed_text, (10, 70))
 
     pygame.display.flip()
     clock.tick(FPS)
