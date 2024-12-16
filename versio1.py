@@ -16,6 +16,8 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
+ORANGE = (252, 157, 3)
+CYAN = (248, 3, 252)
 
 # FPS
 clock = pygame.time.Clock()
@@ -40,6 +42,10 @@ score = 0
 # Fontti
 font = pygame.font.Font(None, 36)
 
+# Kerättävien esineiden tyypit
+POINTS100 = 1
+SHIELD = 2
+
 # Pelin tallennus
 def save_score(score):
     with open("highscore.txt", "w") as f:
@@ -54,6 +60,8 @@ def load_score():
 
 highscore = load_score()
 
+kilpi_paalla = False 
+
 # Funktio esteiden luomiseen
 def create_obstacle():
     x = random.randint(0, SCREEN_WIDTH - obstacle_width)
@@ -61,9 +69,14 @@ def create_obstacle():
     # esteen tyyppi (kerättävä = 1, este = 2)
     if random.randint(1, 10) > 7:
         kerattava_tyyppi = 1
+        if random.randint(1, 10) > 7:
+            esine_tyyppi = SHIELD
+        else:
+            esine_tyyppi = POINTS100         
     else:
         kerattava_tyyppi = 2
-    return [x, y, kerattava_tyyppi]
+        esine_tyyppi = 0
+    return [x, y, kerattava_tyyppi, esine_tyyppi]
 
 # Pelilooppi
 running = True
@@ -104,11 +117,19 @@ while running:
             player_y + player_size > obstacle[1]):
             # jos osuu esteeseen peli loppuu, jos osuu kerättävään esineeseen peli jatkuu
             if obstacle[2] == 2:
-                running = False
+                if kilpi_paalla:
+                    kilpi_paalla = False 
+                    obstacles.remove(obstacle)
+                else:
+                    running = False
             else:
-                # kerättävästä esineestä tulee nyt vain 100 pistettä
-                obstacles.remove(obstacle)
-                score += 100
+                if obstacle[3] == POINTS100:
+                    # pisteet
+                    obstacles.remove(obstacle)
+                    score += 100
+                elif obstacle[3] == SHIELD:
+                    obstacles.remove(obstacle)
+                    kilpi_paalla = True
 
     # Pisteiden laskenta
     # score += 1
@@ -117,12 +138,20 @@ while running:
 
     # Piirrä pelaaja ja esteet
     pygame.draw.rect(screen, BLUE, (player_x, player_y, player_size, player_size))
+
+    # Piirrä kipli
+    if kilpi_paalla:
+        pygame.draw.rect(screen, CYAN, (player_x, player_y, player_size, player_size), 4)
+
     for obstacle in obstacles:
         if obstacle[2] == 2:
             pygame.draw.rect(screen, RED, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
         elif obstacle[2] == 1:
-            pygame.draw.rect(screen, GREEN, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
-
+            if obstacle[3] == POINTS100:
+                pygame.draw.rect(screen, GREEN, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
+            elif obstacle[3] == SHIELD:
+                pygame.draw.rect(screen, ORANGE, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
+             
     # Piirrä pisteet
     score_text = font.render(f"Pisteet: {score}", True, BLACK)
     highscore_text = font.render(f"Ennätys: {highscore}", True, BLACK)
