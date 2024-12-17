@@ -29,6 +29,22 @@ player_x = SCREEN_WIDTH // 2
 player_y = 10  # Pelaaja lähellä yläreunaa
 player_speed = 5
 max_vertical_speed = 10
+player_starting_lives = 1
+
+player_lives = player_starting_lives
+
+# Aseta fontti
+font = pygame.font.Font(None, 32)
+
+# Tekstin asetukset
+game_over_text = font.render('PELI OHI!', True, BLACK, WHITE)
+game_over_rect = game_over_text.get_rect()
+game_over_rect.center = (SCREEN_WIDTH//2, SCREEN_HEIGHT//2)
+
+continue_text = font.render('Paina mitä tahansa näppäintä pelataksesi uudelleen', True, BLACK, WHITE)
+continue_rect = continue_text.get_rect()
+continue_rect.center = (SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + 32)
+
 
 # Esteet
 obstacle_width = 50
@@ -38,9 +54,6 @@ obstacles = []
 
 # Pisteet
 score = 0
-
-# Fontti
-font = pygame.font.Font(None, 36)
 
 # Kerättävien esineiden tyypit
 POINTS100 = 1
@@ -77,6 +90,17 @@ def create_obstacle():
         kerattava_tyyppi = 2
         esine_tyyppi = 0
     return [x, y, kerattava_tyyppi, esine_tyyppi]
+
+# Funktio pelin resetoimiseen game-overin jälkeen
+def reset_game():
+    global player_x, player_y, player_lives, obstacles, score, kilpi_paalla
+    player_x = SCREEN_WIDTH // 2
+    player_y = 10
+    player_lives = player_starting_lives
+    obstacles = []  # Tyhjennä esteet
+    score = 0
+    kilpi_paalla = False
+
 
 # Pelilooppi
 running = True
@@ -121,7 +145,9 @@ while running:
                     kilpi_paalla = False 
                     obstacles.remove(obstacle)
                 else:
-                    running = False
+                    player_lives -= 1
+                    obstacles.remove(obstacle)                    
+                    
             else:
                 if obstacle[3] == POINTS100:
                     # pisteet
@@ -162,6 +188,23 @@ while running:
 
     pygame.display.flip()
     clock.tick(FPS)
+
+        # Tarkista onko Game-Over
+    if player_lives <= 0:
+        screen.blit(game_over_text, game_over_rect)
+        screen.blit(continue_text, continue_rect)
+        pygame.display.update()
+
+        # Pause kunnes pelaaja painaa nappia
+        is_paused = True
+        while is_paused:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    reset_game()  # Nollaa peli ja aloita alusta
+                    is_paused = False
+                if event.type == pygame.QUIT:
+                    is_paused = False
+                    running = False
 
 # Tallenna korkein pistemäärä
 save_score(highscore)
