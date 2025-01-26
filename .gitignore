@@ -1,0 +1,14 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/Pygame/FileContentIndex/9855ce3d-9bc5-4883-8b58-3348eaa28643.vsidx
+/.vs/Pygame/FileContentIndex/60e1d6c8-2ca6-426b-a197-eae8f177896e.vsidx
+/.vs/Pygame/FileContentIndex/d0444913-5324-4805-b57d-1ee803e258fb.vsidx
+/.vs/Pygame/FileContentIndex/06bf4dbc-3a41-4f28-953c-8d10b413e63f.vsidx
+/.vs/Pygame/FileContentIndex/d6796d66-16f9-46e4-b5f2-c4bec5188f74.vsidx
+/.vs/Pygame/FileContentIndex/28ca1f1d-91a8-4d28-8bfb-7522b677a137.vsidx
+/.vs/Pygame/FileContentIndex/f9d85538-c0ce-4a53-bad4-6b17906902e8.vsidx
+*.vsidx
+/.vs/Pygame/FileContentIndex/06bf4dbc-3a41-4f28-953c-8d10b413e63f.vsidx
+/.vs/Pygame/FileContentIndex/f9d85538-c0ce-4a53-bad4-6b17906902e8.vsidx
