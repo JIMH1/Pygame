@@ -12,3 +12,5 @@
 *.vsidx
 /.vs/Pygame/FileContentIndex/06bf4dbc-3a41-4f28-953c-8d10b413e63f.vsidx
 /.vs/Pygame/FileContentIndex/f9d85538-c0ce-4a53-bad4-6b17906902e8.vsidx
+*.jpg
+*.png
