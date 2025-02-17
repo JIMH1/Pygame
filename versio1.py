@@ -183,8 +183,8 @@ def reset_game():
 def game_over_screen():
     #Display game over screen and wait for a key press.
     over = True
-    game_over_text = font.render("PELI OHI!", True, BLACK)
-    continue_text = small_font.render("Paina mitä tahansa näppäintä jatkaaksesi", True, BLACK)
+    game_over_text = font.render("PELI OHI! Paina mitä tahansa näppäintä palataksesi valikkoon." , True, BLACK)
+    continue_text = small_font.render("Sait kerättyä pisteitä: " + str(score), True, BLACK)
     while over:
         screen.fill(WHITE)
         game_over_rect = game_over_text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 - 30))
@@ -213,9 +213,9 @@ def peli_looppi():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    obstacle_speed = min(max_vertical_speed, obstacle_speed + 1)
                 if event.key == pygame.K_DOWN:
+                    obstacle_speed = min(max_vertical_speed, obstacle_speed + 1)
+                if event.key == pygame.K_UP:
                     obstacle_speed = max(1, obstacle_speed - 1)
                 if event.key == pygame.K_SPACE:
                     return "pause"
@@ -294,13 +294,13 @@ def peli_looppi():
         pygame.display.flip()
         clock.tick(FPS)
 
-            # Tarkista onko Game-Over
+             # Tarkista onko Game-Over
         if player_lives <= 0:
             game_started = False
             game_over_screen()
             reset_game()
             return "game_over"
-            # Pause kunnes pelaaja painaa nappia
+             # Pause kunnes pelaaja painaa nappia
             is_paused = True
             while is_paused:
                 for event in pygame.event.get():
@@ -309,7 +309,7 @@ def peli_looppi():
                         is_paused = False
                     if event.type == pygame.QUIT:
                         is_paused = False
-                        playing = False
+                        playing = False  
 
 running = True
 while running:
@@ -336,5 +336,3 @@ while running:
 save_score(highscore)
 
 pygame.quit()
-
-
