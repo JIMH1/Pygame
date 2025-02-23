@@ -1,3 +1,4 @@
+from urllib.request import HTTPPasswordMgrWithPriorAuth
 import pygame
 import random
 import sys
@@ -211,6 +212,17 @@ def peli_looppi():
     obstacles = []
     playing = True
     soita_musiikkia()
+
+    # Lataa pelissä käytettävät grafiikat:
+    hiihtaja_ei_suojaa = pygame.image.load('graphics\hiihtaja_ei_suojaa.png')
+    hiihtaja_kilpi_paalla = pygame.image.load('graphics\hiihtaja_kilpi_paalla.png')
+    kilpi = pygame.image.load('graphics\kilpi.png')
+    piirakka = pygame.image.load('graphics\piirakka.png')
+    pollit = pygame.image.load('graphics\pollit.png')
+    puu_1 = pygame.image.load('graphics\puu_1.png')
+    puu_2 = pygame.image.load('graphics\puu_2.png')
+    puu_3 = pygame.image.load('graphics\puu_3.png')
+
     while playing:
         screen.fill(WHITE)
 
@@ -278,11 +290,10 @@ def peli_looppi():
             highscore = score
 
         # Piirrä pelaaja ja esteet
-        pygame.draw.rect(screen, BLUE, (player_x, player_y, player_size, player_size))
-
-        # Piirrä kipli
         if kilpi_paalla:
-            pygame.draw.rect(screen, CYAN, (player_x, player_y, player_size, player_size), 4)
+            screen.blit(hiihtaja_kilpi_paalla, (player_x, player_y, player_size, player_size))
+        else:
+            screen.blit(hiihtaja_ei_suojaa, (player_x, player_y, player_size, player_size))
 
         for obstacle in obstacles:
             if obstacle[2] == 2:
