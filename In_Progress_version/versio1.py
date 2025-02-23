@@ -1,7 +1,7 @@
 import pygame
 import random
 import sys
-import os
+from pygame import mixer
 
 # Pygame setup
 pygame.init()
@@ -51,7 +51,6 @@ small_font = pygame.font.Font(None, 32)
 obstacle_width = 50
 obstacle_height = 50
 obstacle_speed = 5
-obstacles = []
 
 
 # Pisteet
@@ -78,6 +77,8 @@ def load_score():
 highscore = load_score()
 
 kilpi_paalla = False 
+
+m_vol = 0.7
 
 # Menu
 def main_menu(resume=False):
@@ -136,8 +137,8 @@ def rules_screen():
         screen.blit(title, title_rect)
         rules_lines = [
             "Use left/right arrow keys to move.",
-            "Avoid obstacles.",
-            "Collect karelian pies (100 points) and (shield) items.",
+            "Avoid red obstacles.",
+            "Collect green (100 points) and orange (shield) items.",
             "Press UP/DOWN to adjust obstacle speed.",
             "Press SPACE to pause the game.",
             "When shield is active, one hit is absorbed.",
@@ -156,10 +157,6 @@ def rules_screen():
                 rules_active = False
         clock.tick(FPS)
         
-# pelimusiikki
-m_vol = 0.7
-vol_inc = 0.1
-
 # Funktio esteiden luomiseen
 def create_obstacle():
     x = random.randint(0, SCREEN_WIDTH - obstacle_width)
@@ -174,9 +171,7 @@ def create_obstacle():
     else:
         kerattava_tyyppi = 2
         esine_tyyppi = 0
-    # esteitä on kolmea eri näköistä: pöllit = 1, puut on 2 - 4
-    esteen_tyyppi = random.randint(1, 4)
-    return [x, y, kerattava_tyyppi, esine_tyyppi, esteen_tyyppi]
+    return [x, y, kerattava_tyyppi, esine_tyyppi]
 
 # Funktio pelin resetoimiseen game-overin jälkeen
 def reset_game():
@@ -187,51 +182,6 @@ def reset_game():
     obstacles = []  # Tyhjennä esteet
     score = 0
     kilpi_paalla = False
-
-running = True
-
-# taustamusiikki
-pygame.mixer.init()
-pygame.mixer.music.load("game.mp3")
-pygame.mixer.music.set_volume(m_vol)
-pygame.mixer.music.play()
-
-# säädä taustamusiikin volumea ylös 10% jos mahdollista
-def vol_up():
-    global m_vol, vol_inc
-    if m_vol <= 0.9:
-        m_vol += vol_inc
-        pygame.mixer.music.set_volume(m_vol)
-
-# säädä taustamuusikin volumea alas 10% jos mahdollista
-def vol_down():
-    global m_vol, vol_inc
-    if m_vol > 0:
-        m_vol -= vol_inc
-        pygame.mixer.music.set_volume(m_vol)
-
-# Graphics - Fixed file paths
-graphics_path = "graphics"
-hiihtaja_ei_suojaa = pygame.image.load(os.path.join(graphics_path, "hiihtaja_ei_suojaa.png"))
-pollit = pygame.image.load(os.path.join(graphics_path, "pollit.png"))
-piirakka = pygame.image.load(os.path.join(graphics_path, "piirakka.png"))
-kilpi = pygame.image.load(os.path.join(graphics_path, "kilpi.png"))
-hiihtaja_kilpi_paalla = pygame.image.load(os.path.join(graphics_path, "hiihtaja_kilpi_paalla.png"))
-puu_1 = pygame.image.load(os.path.join(graphics_path, "puu_1.png"))
-puu_2 = pygame.image.load(os.path.join(graphics_path, "puu_2.png"))
-puu_3 = pygame.image.load(os.path.join(graphics_path, "puu_3.png"))
-# < lisää uudet grafiikat tähän >
-
-# Music - Handle missing file
-theme_song = "game.mp3"
-try:
-    pygame.mixer.init()
-    pygame.mixer.music.load(theme_song)
-    pygame.mixer.music.set_volume(0.7)
-    pygame.mixer.music.play()
-except pygame.error:
-    print(f"Warning: Could not load {theme_song}")
-
 
 def game_over_screen():
     #Display game over screen and wait for a key press.
@@ -258,6 +208,7 @@ def peli_looppi():
     global obstacles, score, highscore, player_x, player_y, kilpi_paalla, obstacle_speed, player_lives, game_started
     obstacles = []
     playing = True
+    soita_musiikkia()
     while playing:
         screen.fill(WHITE)
 
@@ -272,17 +223,13 @@ def peli_looppi():
                     obstacle_speed = max(1, obstacle_speed - 1)
                 if event.key == pygame.K_SPACE:
                     return "pause"
-                if event.key == pygame.K_PLUS:
-                    vol_up()
-                if event.key == pygame.K_MINUS:
-                    vol_down()
-
-    # Pelaajan liike
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] and player_x > 0:
-        player_x -= player_speed
-    if keys[pygame.K_RIGHT] and player_x < SCREEN_WIDTH - player_size:
-        player_x += player_speed        
+                
+        # Pelaajan liike
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and player_x > 0:
+            player_x -= player_speed
+        if keys[pygame.K_RIGHT] and player_x < SCREEN_WIDTH - player_size:
+            player_x += player_speed        
 
         # Esteiden hallinta
         if random.randint(1, 20) == 1:
@@ -324,31 +271,21 @@ def peli_looppi():
         if score > highscore:
             highscore = score
 
-    # Piirrä pelaaja ja esteet    
+        # Piirrä pelaaja ja esteet
+        pygame.draw.rect(screen, BLUE, (player_x, player_y, player_size, player_size))
 
-    # Piirrä kipli
-    if kilpi_paalla:
-        screen.blit(hiihtaja_kilpi_paalla, (player_x, player_y, player_size, player_size))
-    else:
-        screen.blit(hiihtaja_ei_suojaa, (player_x, player_y, player_size, player_size))
+        # Piirrä kipli
+        if kilpi_paalla:
+            pygame.draw.rect(screen, CYAN, (player_x, player_y, player_size, player_size), 4)
 
-    for obstacle in obstacles:
-        if obstacle[2] == 2:
-            #pygame.draw.rect(screen, RED, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
-            if obstacle[4] == 1:
-                screen.blit(pollit, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
-            elif obstacle[4] == 2:
-                screen.blit(puu_1, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
-            elif obstacle[4] == 3:
-                screen.blit(puu_2, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
-            elif obstacle[4] == 4:
-                screen.blit(puu_3, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
-        elif obstacle[2] == 1:
-            if obstacle[3] == POINTS100:
-                #pygame.draw.rect(screen, GREEN, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
-                screen.blit(piirakka, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
-            elif obstacle[3] == SHIELD:
-                screen.blit(kilpi, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
+        for obstacle in obstacles:
+            if obstacle[2] == 2:
+                pygame.draw.rect(screen, RED, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
+            elif obstacle[2] == 1:
+                if obstacle[3] == POINTS100:
+                    pygame.draw.rect(screen, GREEN, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
+                elif obstacle[3] == SHIELD:
+                    pygame.draw.rect(screen, ORANGE, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
 
         # Piirrä pisteet
         score_text = font.render(f"Pisteet: {score}", True, BLACK)
@@ -376,17 +313,23 @@ def peli_looppi():
                         is_paused = False
                     if event.type == pygame.QUIT:
                         is_paused = False
-                        playing = True  
+                        playing = False  
+
+def soita_musiikkia():
+    global m_vol
+    mixer.init() 
+    mixer.music.load("game.mp3") 
+    mixer.music.set_volume(m_vol) 
+    mixer.music.play() 
 
 running = True
 while running:
-    print(f"Pelin tila: {game_state}")  # Debug-tulostus
     if game_state == "menu":
         menu_choice = main_menu(resume=game_started)
-        print(f"Menuvalinta: {menu_choice}")  # Debug-tulostus
         if menu_choice == "start":
-            reset_game()
-            game_started = True
+            if not game_started:
+                reset_game()
+                game_started = True
             game_state = "playing"
         elif menu_choice == "rules":
             game_state = "rules"
@@ -394,14 +337,11 @@ while running:
         rules_screen()
         game_state = "menu"
     elif game_state == "playing":
-        print("Siirrytään pelilooppiin...")  # Debug-tulostus
         result = peli_looppi()
-        print(f"Peli looppi päättyi, result = {result}")  # Debug
         if result == "pause":
             game_state = "menu"
         elif result == "game_over":
             game_state = "menu"
-
             
 # Tallenna korkein pistemäärä
 save_score(highscore)
