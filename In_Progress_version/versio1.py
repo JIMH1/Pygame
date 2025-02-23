@@ -232,6 +232,12 @@ def peli_looppi():
     puu_2 = pygame.image.load('graphics\puu_2.png')
     puu_3 = pygame.image.load('graphics\puu_3.png')
 
+    # Lataa äänieffektit:
+    sound_effects_game_over = pygame.mixer.Sound("sound_effects\game_over.mp3")
+    sound_effects_points_received = pygame.mixer.Sound("sound_effects\points_received.mp3")
+    sound_effects_shield_received = pygame.mixer.Sound("sound_effects\shield_received.mp3")
+    sound_effects_shield_hit = pygame.mixer.Sound("sound_effects\shield_hit.mp3")
+
     while playing:
         screen.fill(WHITE)
 
@@ -279,19 +285,23 @@ def peli_looppi():
                     if kilpi_paalla:
                         kilpi_paalla = False 
                         obstacles.remove(obstacle)
+                        pygame.mixer.Sound.play(sound_effects_shield_hit)
                     else:
                         running = False
                         player_lives -= 1
-                        obstacles.remove(obstacle)                    
-                        
+                        obstacles.remove(obstacle)    
+                        pygame.mixer.Sound.play(sound_effects_game_over)
+                        pygame.mixer.music.stop()
                 else:
                     if obstacle[3] == POINTS100:
                         # pisteet
                         obstacles.remove(obstacle)
                         score += 100
+                        pygame.mixer.Sound.play(sound_effects_points_received)
                     elif obstacle[3] == SHIELD:
                         obstacles.remove(obstacle)
                         kilpi_paalla = True
+                        pygame.mixer.Sound.play(sound_effects_shield_received)
 
         # Pisteiden laskenta
         # score += 1
