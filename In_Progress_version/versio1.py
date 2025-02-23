@@ -59,9 +59,16 @@ score = 0
 
 # Fontti
 font = pygame.font.Font(None, 36)
+
 # Kerättävien esineiden tyypit
 POINTS100 = 1
 SHIELD = 2
+
+# Esteiden tyypit
+ESTETYYPPI_POLLI = 1
+ESTETYYPPI_PUU_1 = 2
+ESTETYYPPI_PUU_2 = 3
+ESTETYYPPI_PUU_3 = 4
 
 # Pelin tallennus
 def save_score(score):
@@ -164,6 +171,7 @@ def rules_screen():
 def create_obstacle():
     x = random.randint(0, SCREEN_WIDTH - obstacle_width)
     y = SCREEN_HEIGHT  # Aloita alhaalta
+    esteen_tyyppi = 0
     # esteen tyyppi (kerättävä = 1, este = 2)
     if random.randint(1, 10) > 7:
         kerattava_tyyppi = 1
@@ -174,7 +182,8 @@ def create_obstacle():
     else:
         kerattava_tyyppi = 2
         esine_tyyppi = 0
-    return [x, y, kerattava_tyyppi, esine_tyyppi]
+        esteen_tyyppi = random.randint(1, 4)
+    return [x, y, kerattava_tyyppi, esine_tyyppi, esteen_tyyppi]
 
 # Funktio pelin resetoimiseen game-overin jälkeen
 def reset_game():
@@ -297,12 +306,19 @@ def peli_looppi():
 
         for obstacle in obstacles:
             if obstacle[2] == 2:
-                pygame.draw.rect(screen, RED, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
+                if obstacle[4] == ESTETYYPPI_POLLI:
+                    screen.blit(pollit, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
+                elif obstacle[4] == ESTETYYPPI_PUU_1:
+                    screen.blit(puu_1, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
+                elif obstacle[4] == ESTETYYPPI_PUU_2:
+                    screen.blit(puu_2, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
+                elif obstacle[4] == ESTETYYPPI_PUU_3:
+                    screen.blit(puu_3, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
             elif obstacle[2] == 1:
                 if obstacle[3] == POINTS100:
-                    pygame.draw.rect(screen, GREEN, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
+                    screen.blit(piirakka, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
                 elif obstacle[3] == SHIELD:
-                    pygame.draw.rect(screen, ORANGE, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
+                    screen.blit(kilpi, (obstacle[0], obstacle[1], obstacle_width, obstacle_height))
 
         # Piirrä pisteet
         score_text = font.render(f"Pisteet: {score}", True, BLACK)
