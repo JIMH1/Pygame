@@ -147,8 +147,8 @@ def rules_screen():
         screen.blit(title, title_rect)
         rules_lines = [
             "Use left/right arrow keys to move.",
-            "Avoid red obstacles.",
-            "Collect green (100 points) and orange (shield) items.",
+            "Avoid obstacles (logs and trees).",
+            "Collect Karelian Pies (100 points) and Shield items.",
             "Press UP/DOWN to adjust obstacle speed.",
             "Press SPACE to pause the game.",
             "When shield is active, one hit is absorbed.",
