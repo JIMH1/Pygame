@@ -175,7 +175,7 @@ def create_obstacle():
     # esteen tyyppi (kerättävä = 1, este = 2)
     if random.randint(1, 10) > 7:
         kerattava_tyyppi = 1
-        if random.randint(1, 10) > 7:
+        if random.randint(1, 10) > 8:
             esine_tyyppi = SHIELD
         else:
             esine_tyyppi = POINTS100         
