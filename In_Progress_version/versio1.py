@@ -78,7 +78,9 @@ highscore = load_score()
 
 kilpi_paalla = False 
 
+# PElimusiikki:
 m_vol = 0.7
+vol_diff = 0.1
 
 # Menu
 def main_menu(resume=False):
@@ -223,6 +225,10 @@ def peli_looppi():
                     obstacle_speed = max(1, obstacle_speed - 1)
                 if event.key == pygame.K_SPACE:
                     return "pause"
+                if event.key == pygame.K_PLUS:
+                    vola_ylos()
+                if event.key == pygame.K_MINUS:
+                    vola_alas()
                 
         # Pelaajan liike
         keys = pygame.key.get_pressed()
@@ -315,12 +321,29 @@ def peli_looppi():
                         is_paused = False
                         playing = False  
 
+# aloita taustamusiikin soittaminen sillä volalla mikä on asetettu
 def soita_musiikkia():
     global m_vol
     mixer.init() 
     mixer.music.load("game.mp3") 
     mixer.music.set_volume(m_vol) 
     mixer.music.play() 
+
+# nosta taustamusiikin volaa asetetulla määrällä
+def vola_ylos():
+    global m_vol
+    m_vol += vol_diff
+    if (m_vol > 1):
+        m_vol = 1
+    mixer.music.set_volume(m_vol) 
+
+# laske taustamusiikin volaa asetetulla määrällä
+def vola_alas():
+    global m_vol
+    m_vol -= vol_diff
+    if (m_vol < 0):
+        m_vol = 0
+    mixer.music.set_volume(m_vol) 
 
 running = True
 while running:
